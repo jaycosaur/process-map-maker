@@ -1,0 +1,59 @@
+.App {
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 0 !important;
+  padding-top: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.App-header {
+  background-color: #222;
+  height: 150px;
+  padding: 20px;
+  color: white;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+.navbar {
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 0;
+  padding-top: 0;
+  padding-left: 0;
+  padding-right: 0;
+  border-radius: 0;
+  border-width: 0;
+  background-color: #1a9ed9;
+}
+
+.navbar-default {
+  color: white !important;  
+}
+
+.page-header {
+  margin-top: 0px;
+}
+
+.navbar-default .navbar-nav>li>a {
+  color: white;
+}
+
+.navbar-default .navbar-nav>li.active {
+  opacity: 0.9;
+}
+
+.navbar-brand {
+  font-size: 32px;
+}
+
+.navbar-brand>span {
+  font-size: 20px;
+}
+
+.brand-symbol{
+
+}

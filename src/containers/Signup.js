@@ -144,17 +144,13 @@ export default class Signup extends Component {
     };
     var attributeGivenName = new CognitoUserAttribute(dataGivenName);
     var attributeFamilyName = new CognitoUserAttribute(dataFamilyName);
-    var attributePhoneNumber = new CognitoUserAttribute(dataPhoneNumber);
-    var attributeOrganisation = new CognitoUserAttribute(dataOrganisation);
 
     attributeList.push(attributeGivenName);
     attributeList.push(attributeFamilyName);
-    attributeList.push(attributePhoneNumber);
-    attributeList.push(attributeOrganisation);
     
   
     return new Promise((resolve, reject) =>
-      userPool.signUp(email, password, [], null, (err, result) => {
+      userPool.signUp(email, password, attributeList, null, (err, result) => {
         if (err) {
           reject(err);
           return;

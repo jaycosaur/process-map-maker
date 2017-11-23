@@ -13,6 +13,7 @@ import ProcessMaps from "./containers/ProcessMaps";
 import Contact from "./containers/Contact";
 import MyProfile from "./containers/MyProfile";
 import ResetPassword from "./containers/ResetPassword";
+import Shared from "./containers/Shared";
 
 
 import NotFound from "./containers/NotFound";
@@ -26,6 +27,7 @@ export default ({ childProps }) =>
     <AuthenticatedRoute path="/processmaps" exact component={Home} props={childProps} />
     <AuthenticatedRoute path="/processmaps/new" exact component={NewProcessMap} props={childProps} />
     <AuthenticatedRoute path="/processmaps/:id" exact component={ProcessMaps} props={childProps} />
+    <AuthenticatedRoute path="/shared/:id" exact component={Shared} props={childProps} />
     <AuthenticatedRoute path="/contact" exact component={Contact} props={childProps} />
     <AuthenticatedRoute path="/myprofile" exact component={MyProfile} props={childProps} />
     { /* Finally, catch all unmatched routes */ }

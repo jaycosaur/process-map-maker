@@ -37,8 +37,9 @@ export default class Home extends Component {
       const results = await this.datasets();
       this.setState({ datasets: results });
     } catch (e) {
-      this.setState({isError: true})
-      this.setState({errorMessage: "Error: Couldn't fetch process maps"})
+      this.setState({isError: true});
+      console.log(e);
+      this.setState({errorMessage: "Error: Couldn't fetch process maps"});
     }
 
     try {
@@ -124,15 +125,14 @@ export default class Home extends Component {
         i !== 0
           ? <ListGroupItem
               bsStyle={this.bsStyleGen(dataset.state)}
-              key={dataset.datasetId}
-              href={`/processmaps/${dataset.datasetId}`}
+              key={dataset.processMapId}
+              href={`/processmaps/${dataset.processMapId}`}
               onClick={this.handleDatasetClick}
               header={dataset.title.trim().split("\n")[0]}
             >
             <strong>Process Map Description:</strong>
             {dataset.description.toLocaleString()}
             <ul>
-              <li>{"Current State: " + dataset.state.toLocaleString()}</li>
               <li>{"Created: " + new Date(dataset.createdAt).toLocaleString()}</li>
             </ul>
             </ListGroupItem>

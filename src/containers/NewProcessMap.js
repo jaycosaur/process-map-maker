@@ -16,7 +16,7 @@ export default class NewProcessMap extends Component {
       isUnsaved: false,
       isLoading: null,
       title: "Check this funky title!",
-      description: "",
+      description: "dummy",
       content: sampleData,
       isShared: false,
       sharedLinkCode: "lhlsdfoasdfi",
@@ -227,40 +227,34 @@ export default class NewProcessMap extends Component {
     this.file = event.target.files[0];
   }
 
-  handleSubmit = async event => {
+  handleSave = async event => {
     event.preventDefault();
-    if (this.file && this.file.size > config.MAX_ATTACHMENT_SIZE) {
-      alert("Please pick a file smaller than 100MB");
-      return;
-    }
     this.setState({ isLoading: true });
   
     try {
-      const uploadedFilename = this.file
-        ? (await s3Upload(this.file, this.updateProgress)).Location
-        : null;
-
-      await this.createDataset({
+      const response = await this.createDataset({
         title: this.state.title,
         description: this.state.description,
-        attachment: uploadedFilename
+        content: JSON.stringify(this.state.content)
       });
-      this.props.history.push("/");
+      this.setState({
+        isUnsaved: false
+      })
+      this.props.history.push(`/processmaps/${response.processMapId}`);
     } catch (e) {
+      console.log(e)
       alert(e);
       this.setState({ isLoading: false });
     }
   }
 
-  handleSave = async event => {
-    this.setState({
-      isLoading: true
-    })
-    this.setState({
-      isLoading: false,
-      isUnsaved: false
-    })
-  };
+  createDataset(processMap) {
+    return invokeApig({
+      path: "/processmaps/",
+      method: "POST",
+      body: processMap
+    });
+  }
 
   deleteStream(i, e){
     var newStreams = this.state.content.streams
@@ -298,14 +292,6 @@ export default class NewProcessMap extends Component {
       isUnsaved: true,
     });
 
-  }
-
-  createDataset(dataset) {
-    return invokeApig({
-      path: "/datasets",
-      method: "POST",
-      body: dataset
-    });
   }
 
   renderPropertyPane() {

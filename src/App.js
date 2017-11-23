@@ -85,7 +85,10 @@ class App extends Component {
                   <RouteNavItem key={4} href="/myprofile"><span className="glyphicon glyphicon-user"></span>  Profile</RouteNavItem>,
                   <NavItem key={5} onClick={this.handleLogout}><span className="glyphicon glyphicon-log-out"></span>  Logout</NavItem> ]
                 : [
-                  <RouteNavItem key={6} href="/login">
+                  <RouteNavItem key={6} href="/signup">
+                    <strong>Signup</strong>
+                  </RouteNavItem>,
+                  <RouteNavItem key={7} href="/login">
                     <strong>Login</strong>
                   </RouteNavItem>
                 ]}

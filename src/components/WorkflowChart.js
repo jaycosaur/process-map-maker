@@ -35,7 +35,6 @@ class App extends Component {
     catch(err) {
         this.props.errorCallBack(err);
     }     
-    
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -222,7 +221,9 @@ class App extends Component {
     }.bind(this));
     a.append("foreignObject").append("xhtml:body").html(function(t) {
         return "decision" === t.type ? '<div style="width:100px;padding:10px;margin-top:25px;text-align:center;    max-height: 50px;overflow: hidden;">' + t.title + "</div>" : "connector-start" === t.type || "connector-end" === t.type ? '<div style="width:98px;padding:5px;margin-top:15px;text-align:center;    max-height: 50px;overflow: hidden;">' + t.title + "</div>" : '<div style="width:170px;padding:10px;">' + t.title + "</div>"
-    })
+    }).on('click',function(d){
+      this.props.nodeCallBack(d)
+    }.bind(this))
   }
 
   //draws connectors

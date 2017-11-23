@@ -19,11 +19,11 @@ export default class NewProcessMap extends Component {
       description: "dummy",
       content: sampleData,
       isShared: false,
-      sharedLinkCode: "lhlsdfoasdfi",
+      sharedLinkCode: null,
       uploadProgress: 0,
       newStream: "",
       hideEditPane: false,
-      chartState: false,
+      chartState: true,
     };
     this.nodeCallBackFn = this.nodeCallBackFn.bind(this)
   }
@@ -602,10 +602,10 @@ export default class NewProcessMap extends Component {
         </FormGroup>
         <Row>
           <Col xs={6}>
-            <Button block onClick={this.handleShareButton} bsSize='small'> <strong><span className="glyphicon glyphicon-send"></span> {this.state.isShared ? 'Update link' : 'Create new link'}</strong> </Button>
+            <Button block disabled = {true} onClick={this.handleShareButton} bsSize='small'> <strong><span className="glyphicon glyphicon-send"></span> {this.state.isShared ? 'Update link' : 'Create new link'}</strong> </Button>
           </Col>
           <Col xs={6}>
-            <Button bsStyle = 'danger' disabled = {!this.state.isShared} block onClick={this.handleShareDelete} bsSize='small'> <strong><span className="glyphicon glyphicon-trash"></span> Disable Sharing </strong> </Button>
+            <Button bsStyle = 'danger' disabled = {true} block onClick={this.handleShareDelete} bsSize='small'> <strong><span className="glyphicon glyphicon-trash"></span> Disable Sharing </strong> </Button>
           </Col>
         </Row>
       </form>

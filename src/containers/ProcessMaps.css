@@ -198,3 +198,17 @@ pre, .banner {
   border-radius: 0;
   margin-bottom: 0;
 }
+
+.modal-container {
+  position: relative;
+}
+.modal-container .modal, .modal-container .modal-backdrop {
+  position: absolute;
+}
+.modal {
+  background-color: rgba(0, 0, 0, 0.3)
+}
+
+.modal-content {
+  border-radius: 0px;
+}

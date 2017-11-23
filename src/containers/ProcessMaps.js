@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Glyphicon, Form, Well, InputGroup, Button, FormGroup, FormControl, ControlLabel, HelpBlock, Grid, Row, Col, PanelGroup,Panel } from "react-bootstrap";
+import { Modal, Glyphicon, Form, Well, InputGroup, Button, FormGroup, FormControl, ControlLabel, HelpBlock, Grid, Row, Col, PanelGroup,Panel } from "react-bootstrap";
 import LoaderButton from "../components/LoaderButton";
 import "./ProcessMaps.css";
 import config from "../config";
@@ -26,8 +26,28 @@ export default class ProcessMap extends Component {
       newStream: "",
       hideEditPane: false,
       chartState: false,
+      modalData: null,
+      modalShow: false
     };
-    this.nodeCallBackFn = this.nodeCallBackFn.bind(this)
+    this.nodeCallBackFn = this.nodeCallBackFn.bind(this);
+    this.modalCallBack = this.modalCallBack.bind(this);
+  }
+
+  modalView(){
+    return (
+      <div>
+      <Modal.Dialog bsSize='sm'>
+        <Modal.Header>
+          <Modal.Title>{this.state.modalData.title}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {JSON.stringify(this.state.modalData, null, 2)}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={this.modalCallBack}>Close</Button>
+        </Modal.Footer>
+      </Modal.Dialog>
+    </div> );
   }
 
   async componentDidMount() {
@@ -196,41 +216,17 @@ export default class ProcessMap extends Component {
       }
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   nodeCallBackFn  = (node) => {
+    this.setState({
+      modalShow: true,
+      modalData: node})
+    console.log('clicked!')
     console.log(node);
+  }
+
+  modalCallBack() {
+    this.setState({modalShow: false});
+    console.log('closed!')
   }
 
   errorCallBackFn  = (e) => {
@@ -827,6 +823,8 @@ export default class ProcessMap extends Component {
       )
   } 
 
+
+
   renderPrettyPrint(objs){
       return (
         <pre><code><div dangerouslySetInnerHTML={{ __html: JSON.stringify(objs, null, 2)}} /></code></pre>
@@ -840,6 +838,7 @@ export default class ProcessMap extends Component {
           { this.state.isUnsaved !== false ? this.unsavedAlert() : null }
           {this.state.hideEditPane ? this.hideBar() : null}
           <Panel className="chartcont modal-container">
+            {this.state.modalShow && this.modalView()}
             { this.state.chartState 
               ? <WorkflowChart id="d3-workflow" data={ this.state.content } key={Math.random()} errorCallBack = {this.errorCallBackFn} nodeCallBack={this.nodeCallBackFn}/> 
               : this.renderPrettyPrint(this.state.content,null,4)}

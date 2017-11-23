@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Glyphicon, Alert, Jumbotron, Button, PageHeader, ListGroup, ListGroupItem, Grid, Row, Col, Panel, Well } from "react-bootstrap";
+import { Form, FormGroup, ControlLabel, FormControl, PanelGroup, Glyphicon, Alert, Jumbotron, Button, PageHeader, ListGroup, ListGroupItem, Grid, Row, Col, Panel, Well } from "react-bootstrap";
 
 import "./Home.css";
 
@@ -81,33 +81,6 @@ export default class Home extends Component {
     return {};
   }
 
-  bsStyleGen(datasetState) {
-    switch(datasetState) {
-      case "Pending Processing":
-        return "info";
-
-      case "Processing":
-        return "warning";
-
-      case "Processing Complete":
-        return "success";
-      
-      case "Failed":
-        return "danger";
-
-      default:
-        return "Failed";
-    }
-  };
-
-  renderNews(news) {
-    return (
-      <Panel header={<p>Latest News</p>}>
-        <Well>{"No news to show."}</Well>
-      </Panel>
-    );
-  }
-
   renderOutages(outages) {
     return (
       <Panel header={<h3>Service Outages</h3>}>
@@ -117,40 +90,6 @@ export default class Home extends Component {
         [ "No outages have been planned." ]}
       </Panel>
     );
-  }
-
-  renderDatasetsList(datasets) {
-    return [{}].concat(datasets).sort(function(b,a) {return a.createdAt - b.createdAt}).map(
-      (dataset, i) =>
-        i !== 0
-          ? <ListGroupItem
-              bsStyle={this.bsStyleGen(dataset.state)}
-              key={dataset.processMapId}
-              href={`/processmaps/${dataset.processMapId}`}
-              onClick={this.handleDatasetClick}
-              header={dataset.title.trim().split("\n")[0]}
-            >
-            <strong>Process Map Description:</strong>
-            {dataset.description.toLocaleString()}
-            <ul>
-              <li>{"Created: " + new Date(dataset.createdAt).toLocaleString()}</li>
-            </ul>
-            </ListGroupItem>
-          : <ListGroupItem
-              key="new"
-              href="/processmaps/new"
-              onClick={this.handleDatasetClick}
-            >
-              <h4>
-                <strong><span className="glyphicon glyphicon-plus-sign"></span> Create a new process map and share it with anyone</strong>
-              </h4>
-            </ListGroupItem>
-    );
-  }
-  
-  handleDatasetClick = event => {
-    event.preventDefault();
-    this.props.history.push(event.currentTarget.getAttribute("href"));
   }
 
   renderLander() {
@@ -181,8 +120,6 @@ export default class Home extends Component {
     );
   }
 
-
-
   renderUpperAlert() {
     return (
         <Alert style={{'border-radius': '0', 'background-color': '#d9534f', 'color':'white','border-width':'0'}} bsStyle="danger" onDismiss={this.handleAlertDismiss}>
@@ -191,28 +128,173 @@ export default class Home extends Component {
       );
   }
 
-  renderDatasets() {
+  addBar(){
+    return (
+      <Row className = 'no-pad'>
+        <Col className = 'no-pad' xs={12}>
+          <Button id='add-new-map-button' className='full-button' block href="/processmaps/new"
+            onClick={this.handleDatasetClick} bsSize='small'>
+              <strong><span className="glyphicon glyphicon-plus-sign"></span> Create a new process map and share it with anyone</strong> 
+          </Button>
+        </Col>
+      </Row>
+    );
+  }
+
+  renderProcessMapListInner(dataset){
+    return (
+      <Panel collapsible
+        id='process-map-list-item'
+        eventKey={dataset.processMapId}
+        style={{'margin-bottom':'0px'}}
+        key={dataset.processMapId}
+        header={
+          <span>
+            <Button id='go-to-map-button' href={`/processmaps/${dataset.processMapId}`}
+              onClick={this.handleDatasetClick} bsSize='small'>
+              <strong><span className="glyphicon glyphicon-random"> </span> Go to map</strong> 
+            </Button>
+            <small>{dataset.title.trim().split("\n")[0]}</small>
+            <Button id='delete-node-button' bsStyle="link" bsSize="xsmall"><Glyphicon glyph="trash"/></Button>
+          </span>
+        }
+        className='node-panel process-map-list-item'
+      >
+      <Well className='no-border take-full-width'>
+        <Form horizontal> 
+            <FormGroup controlId="title" bsSize="small">
+              <Col sm={3} componentClass={ControlLabel}>
+                Title
+              </Col>
+              <Col sm={9}>
+                <FormControl
+                    autoFocus
+                    type="name"
+                    value={dataset.title}
+                    disabled={true}
+                />
+              </Col>
+            </FormGroup>    
+            <FormGroup controlId="description" bsSize="small">
+              <Col sm={3} componentClass={ControlLabel}>
+                Description
+              </Col>
+              <Col sm={9}>
+                <FormControl
+                  componentClass="textarea"
+                  value={dataset.description}
+                  disabled={true}
+                />
+              </Col>
+            </FormGroup>
+            <FormGroup controlId="createdAt" bsSize="small">
+              <Col sm={3} componentClass={ControlLabel}>
+                Created at
+              </Col>
+              <Col sm={9}>
+                <FormControl
+                  componentClass="textarea"
+                  value={new Date(dataset.createdAt).toLocaleString()}
+                  disabled={true}
+                />
+              </Col>
+            </FormGroup>
+            {dataset.isShared}
+            <FormGroup controlId="isShared" bsSize="small">
+              <Col sm={3} componentClass={ControlLabel}>
+                Is shared?
+              </Col>
+              <Col sm={9}>
+                <FormControl
+                  componentClass="name"
+                  value={dataset.isShared ? 'Yes' : 'No'}
+                  disabled={true}
+                />
+              </Col>
+            </FormGroup>
+            <FormGroup controlId="lastShared" bsSize="small">
+              <Col sm={3} componentClass={ControlLabel}>
+                Last shared on:
+              </Col>
+              <Col sm={9}>
+                <FormControl
+                  componentClass="name"
+                  value={dataset.lastShared}
+                  disabled={true}
+                />
+              </Col>
+            </FormGroup>
+            <FormGroup controlId="shareLink" bsSize="small">
+              <Col sm={3} componentClass={ControlLabel}>
+                Share link:
+              </Col>
+              <Col sm={9}>
+                <FormControl
+                  componentClass="name"
+                  value={dataset.sharedLinkCode}
+                  disabled={true}
+                />
+              </Col>
+            </FormGroup>
+          </Form>
+        </Well>
+      </Panel>
+    );
+  }
+
+  renderDatasetsList(datasets) {
+    return [{}].concat(datasets).sort(function(b,a) {return a.createdAt - b.createdAt}).map(
+      (dataset, i) =>
+        i !== 0
+          ? this.renderProcessMapListInner(datasets[i-1])
+          : this.addBar()
+    );
+  }
+  
+  handleDatasetClick = event => {
+    event.preventDefault();
+    this.props.history.push(event.currentTarget.getAttribute("href"));
+  }
+
+  controlSection(){
+      return (
+          <Col xs={12} sm={12} className="sidebar home-sidebar">
+              <PanelGroup accordion className = "sidebar-contents" bsStyle={this.state.isUnsaved !== false ? 'danger' : 'default'}>
+                <Panel className='control-choice' header={<span><small><span className="glyphicon glyphicon-bullhorn"></span> News</small></span>} eventKey='1'>{this.renderNews(this.state.news)}</Panel>
+                <Panel className='control-choice'  header={<span><small><span className="glyphicon glyphicon-flash"></span> Planned Outages </small></span>} eventKey="2"></Panel>
+                <Panel className='control-choice'  header={<span><small><span className="glyphicon glyphicon-heart-empty"></span> Process Map of the Week</small></span>} eventKey='3'></Panel>
+              </PanelGroup>
+          </Col>
+      )
+  }
+
+  renderNews(news) {
+    return (
+      <Panel header={<p>Latest News</p>}>
+        <Well>{"No news to show."}</Well>
+      </Panel>
+    );
+  }
+
+  renderProcessMapList() {
     return (
       <div className="datasets">
         {this.state.isError ? this.renderUpperAlert() : null}
-        <Grid style={{'padding-top':'20px','margin':'0'}}>
-          { !this.state.isFetching 
+          { !this.state.isFetching&&!this.state.isLoading
             ? 
             <Row className="show-grid">
-              <Col xs={12} md={8}> 
-                <PageHeader>Your Dashboard</PageHeader>
+              <Col xs={12} md={4} id='control-section'> 
+                {this.controlSection()}
+              </Col> 
+              <Col xs={12} sm={8} className="sidebar">
                 <ListGroup>
-                  {!this.state.isLoading && this.renderDatasetsList(this.state.datasets)}
+                  {this.renderDatasetsList(this.state.datasets)}
                 </ListGroup>
               </Col>
-              <Col xs={12} md={4}> 
-                {!this.state.isLoading && this.renderNews(this.state.news)}
-              </Col> 
             </Row>
             :
             this.loadingSymbol()
             }
-        </Grid>
       </div>
     );
   }
@@ -220,7 +302,13 @@ export default class Home extends Component {
   render() {
     return (
       <div className="Home">
-        {this.props.isAuthenticated ? this.renderDatasets() : this.renderLander()}
+        <Grid fluid={true}>
+          {this.props.isAuthenticated ? 
+            <Row className="show-grid">
+              {this.renderProcessMapList()}
+            </Row>
+          : this.renderLander()}
+        </Grid>
       </div>
     );
   }

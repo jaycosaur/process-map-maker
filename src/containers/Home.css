@@ -44,3 +44,30 @@
   display: block;
   margin-top: 200px;
 }
+
+#add-new-map-button:hover{
+  background-color: #66bf80;
+}
+
+#go-to-map-button{
+  background-color: #66bf80;
+  color: #fff;
+  border-radius: 0px;
+  border-width: 0px;
+}
+
+#go-to-map-button:hover{
+  background-color: #1a9ed9;  
+}
+
+#control-section{
+  padding-right: 0px;
+}
+
+.process-map-list-item .panel-heading:hover{
+  background-color: #fff;
+}
+
+#go-to-map-button{
+  margin-right: 20px;
+}

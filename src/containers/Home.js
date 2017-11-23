@@ -69,7 +69,7 @@ export default class Home extends Component {
   }
   
   datasets() {
-    return invokeApig({ path: "/processmaps" });
+    return invokeApig({ path: "/processmaps/" });
   }
 
   news() {

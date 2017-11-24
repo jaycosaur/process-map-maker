@@ -71,3 +71,21 @@
 #go-to-map-button{
   margin-right: 20px;
 }
+
+#button-holder{
+  float: right;
+  margin-right: 20px;
+}
+
+#share-map-button:hover{
+  color:#66bf80;
+}
+
+#delete-map-button:hover{
+  color: red;
+}
+
+.control-section{
+  z-index: 99;
+  border-radius: 10px;
+}

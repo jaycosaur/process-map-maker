@@ -1,0 +1,17 @@
+.bottom-window {
+    position: fixed;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    padding: 0.5rem;
+    text-align: center;
+    background-color: #7a8f99;
+    color: white;
+    opacity: 1;
+    z-index: 1000;
+    height: 40vh;
+}
+
+.blue-text {
+    color: #1a9ed9;
+}

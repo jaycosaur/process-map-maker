@@ -4,6 +4,7 @@ import LoaderButton from "../components/LoaderButton";
 import "./Shared.css";
 import { invokeApig } from "../libs/awsLib";
 import WorkflowChart from '../components/WorkflowChart';
+import BottomWindow from '../components/BottomWindow';
 
 export default class Shared extends Component {
   constructor(props) {
@@ -70,6 +71,7 @@ export default class Shared extends Component {
           <Grid fluid={true}>
               {this.renderChartPane(12)}
           </Grid>}
+          <BottomWindow />
         </div>
       )
     }

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Form, FormGroup, ControlLabel, FormControl, PanelGroup, Glyphicon, Alert, Jumbotron, Button, PageHeader, ListGroup, ListGroupItem, Grid, Row, Col, Panel, Well } from "react-bootstrap";
+import { Image, Form, FormGroup, ControlLabel, FormControl, PanelGroup, Glyphicon, Alert, Jumbotron, Button, PageHeader, ListGroup, ListGroupItem, Grid, Row, Col, Panel, Well } from "react-bootstrap";
 
 import "./Home.css";
 
@@ -155,7 +155,11 @@ export default class Home extends Component {
               <strong><span className="glyphicon glyphicon-random"> </span> Go to map</strong> 
             </Button>
             <small>{dataset.title.trim().split("\n")[0]}</small>
-            <Button id='delete-node-button' bsStyle="link" bsSize="xsmall"><Glyphicon glyph="trash"/></Button>
+            <span id='button-holder'>
+              {dataset.isShared && 
+                <Button id='share-map-button' bsStyle="link" bsSize="sm"><Glyphicon glyph="link"/></Button>}
+              <Button id='delete-map-button' bsStyle="link" bsSize="sm"><Glyphicon glyph="trash"/></Button>
+            </span>
           </span>
         }
         className='node-panel process-map-list-item'
@@ -206,7 +210,7 @@ export default class Home extends Component {
               </Col>
               <Col sm={9}>
                 <FormControl
-                  componentClass="name"
+                  componentClass="textarea"
                   value={dataset.isShared ? 'Yes' : 'No'}
                   disabled={true}
                 />
@@ -218,7 +222,7 @@ export default class Home extends Component {
               </Col>
               <Col sm={9}>
                 <FormControl
-                  componentClass="name"
+                  componentClass="textarea"
                   value={dataset.lastShared}
                   disabled={true}
                 />
@@ -230,7 +234,7 @@ export default class Home extends Component {
               </Col>
               <Col sm={9}>
                 <FormControl
-                  componentClass="name"
+                  componentClass="textarea"
                   value={dataset.sharedLinkCode}
                   disabled={true}
                 />
@@ -260,8 +264,9 @@ export default class Home extends Component {
       return (
           <Col xs={12} sm={12} className="sidebar home-sidebar">
               <PanelGroup accordion className = "sidebar-contents" bsStyle={this.state.isUnsaved !== false ? 'danger' : 'default'}>
+                <Panel className='control-choice' header={<span><small><span className="glyphicon glyphicon-question-sign"></span> Help</small></span>} eventKey='0'>{this.renderHelp()}</Panel>
                 <Panel className='control-choice' header={<span><small><span className="glyphicon glyphicon-bullhorn"></span> News</small></span>} eventKey='1'>{this.renderNews(this.state.news)}</Panel>
-                <Panel className='control-choice'  header={<span><small><span className="glyphicon glyphicon-flash"></span> Planned Outages </small></span>} eventKey="2"></Panel>
+                <Panel className='control-choice'  header={<span><small><span className="glyphicon glyphicon-flash"></span> Planned Outages </small></span>} eventKey="2">{this.renderOutages()}</Panel>
                 <Panel className='control-choice'  header={<span><small><span className="glyphicon glyphicon-heart-empty"></span> Process Map of the Week</small></span>} eventKey='3'></Panel>
               </PanelGroup>
           </Col>
@@ -270,9 +275,19 @@ export default class Home extends Component {
 
   renderNews(news) {
     return (
-      <Panel header={<p>Latest News</p>}>
-        <Well>{"No news to show."}</Well>
-      </Panel>
+      <Well>{"No news to show."}</Well>
+    );
+  }
+
+  renderOutages(){
+    return (
+      <Well>{"No planned outages."}</Well>
+    );
+  }
+
+  renderHelp(){
+    return (
+      <Image key = {Math.random()} responsive src="https://source.unsplash.com/random/600x400" />
     );
   }
 

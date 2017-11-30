@@ -359,7 +359,7 @@ class App extends Component {
         }
       }).on('click',function(d){
         this.props.nodeCallBack(d)
-      }.bind(this));;
+      }.bind(this));
 
     object_items.append("path")
   

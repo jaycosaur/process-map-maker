@@ -34,6 +34,16 @@ export default class ProcessMap extends Component {
   }
 
   modalView(){
+    function FieldGroup({ id, label, help, ...props }) {
+      return (
+        <FormGroup controlId={id}>
+          <ControlLabel>{label}</ControlLabel>
+          <FormControl {...props} />
+          {help && <HelpBlock>{help}</HelpBlock>}
+        </FormGroup>
+      );
+    }
+
     return (
       <div>
       <Modal.Dialog bsSize='sm'>
@@ -41,7 +51,43 @@ export default class ProcessMap extends Component {
           <Modal.Title>{this.state.modalData.title}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {JSON.stringify(this.state.modalData, null, 2)}
+          <FieldGroup
+            id="formControlsText"
+            type="textarea"
+            label="Description"
+            value={this.state.modalData.description.length>0?this.state.modalData.description:"No description"}
+            disabled={true}
+          />
+          <FieldGroup
+            id="formControlsText"
+            type="textarea"
+            label="Node type"
+            value={this.state.modalData.type}
+            disabled={true}
+          />
+          <FieldGroup
+            id="formControlsText"
+            type="textarea"
+            label="Stream"
+            value={this.state.content.streams[this.state.modalData.stream].title}
+            disabled={true}
+          />
+          <FieldGroup
+            id="formControlsText"
+            type="textarea"
+            label="Attachments"
+            value={this.state.modalData.attachment}
+            href={this.state.modalData.attachment}
+            disabled={true}
+          />
+          
+          
+          
+
+
+
+
+          {/*JSON.stringify(this.state.modalData, null, 2)*/}
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={this.modalCallBack}>Close</Button>

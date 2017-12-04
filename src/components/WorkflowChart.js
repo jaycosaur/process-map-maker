@@ -19,6 +19,8 @@ var full_rect = "M112.95002368402834,1.0483293136913585 L163.91444279600137,1.11
 var connector_circle = "M1.4878047704696655,47.27235916607321 C1.4878047704696655,21.963550944457587 23.708866902807138,1.4634162849489434 51.14227694272995,1.4634162849489434 C78.57568698265275,1.4634162849489434 100.79674911499023,21.963550944457587 100.79674911499023,47.27235916607321 C100.79674911499023,72.58116738768881 78.57568698265275,93.08130204719747 51.14227694272995,93.08130204719747 C23.708866902807138,93.08130204719747 1.4878047704696655,72.58116738768881 1.4878047704696655,47.27235916607321 z";
 var delay_shape = "M0.44196757153116567,0.5869455806497799 L58.97855051856567,0.5869455806497799 L58.97855051856567,0.5869455806497799 C91.30741740989293,0.5869455806497799 117.51513346559983,18.422756443067637 117.51513346559983,40.42434549943574 C117.51513346559983,62.42593722945463 91.30741740989293,80.26174541822121 58.97855051856567,80.26174541822121 L0.44196757153116567,80.26174541822121 L0.44196757153116567,0.5869455806497799 z";
 
+var items_connected_to={};
+
 class App extends Component {
   constructor (props) {
     super(props);
@@ -27,6 +29,7 @@ class App extends Component {
 
   componentDidMount() {
     var data = this.props.data;
+    // var data = json;
     const context = this.setContext();
 
     try {
@@ -74,7 +77,7 @@ class App extends Component {
         items.push(data.items[e]);
       }
     }
-    svg_height = $('#flowChart_div').height();
+    // svg_height = $('#flowChart_div').height();
     this.span_into_grid(data);
     this.elements_locations(grids);
     this.draw_streams(context, data);
@@ -106,20 +109,19 @@ class App extends Component {
         } 
       }
       
-      if(id_loc_x!=linked_loc_x){ //if linked is not in same stream or row
+      if(id_loc_x<linked_loc_x){ //if linked is not in same stream or row
         
-        if(id_loc_y>linked_loc_y){
+        if(id_loc_y!=linked_loc_y){
           
           var swap1=null;
           var swap2=null;
           
           var loops=Number(id_loc_y-linked_loc_y);
           
-          
           for(var lp=0;lp<loops;lp++){
                     
             for(var i2=linked_loc_y;i2<grids[linked_loc_x].length;i2++){
-                        
+
               swap1=grids[linked_loc_x][i2];
               
               if(swap2!=null){
@@ -146,8 +148,6 @@ class App extends Component {
     max_streams=0;
   
     var items_stream_wise={};
-    
-    var items_connected_to={};
     
     $.map(items,function(element,index){
       
@@ -198,21 +198,24 @@ class App extends Component {
     for(var i=0;i<max_streams;i++){
     
     
-    for(var j=0;j<30;j++){
-      
-      if(grids[i][j]!=null){
+      for(var j=0;j<30;j++){
         
-        var check_links=grids[i][j];
-        
-        var process_arr=items_connected_to[check_links];
-        
-        //console.log(process_arr);
-        
-        this.arrange_full_grid(check_links,process_arr,grids); //(element id, element linkTo, grid to be sorted)
+        if(grids[i][j]!=null){
+          
+          var check_links=grids[i][j];
+          
+          var process_arr=items_connected_to[check_links];
+          
+          //console.log(process_arr);
+          
+          this.arrange_full_grid(check_links,process_arr,grids); //(element id, element linkTo, grid to be sorted)
+        }
       }
+      
     }
-    
-  }
+    for ( var i = 0 ; i < grids.length; i ++ ) {
+      this.rearr_grids(grids, items_connected_to, data);
+    }
   }
 
   // draws streams 
@@ -220,7 +223,8 @@ class App extends Component {
     for (var e in t.streams) 
       t.streams.hasOwnProperty(e) && streams.push(t.streams[e].title);
 
-    rect_height = svg_height / (streams.length);
+    if (streams.length > 4)
+      rect_height = svg_height / (streams.length);
 
     var r = context
               .selectAll("rect")
@@ -267,37 +271,62 @@ class App extends Component {
         return d;
       })
 
+    if (streams.length > 4)
+      $("#flowChart_div svg").attr("height", rect_height * streams.length);
+  }
 
-    // var a = d3.select("#flowChart_div")
-    //           .append("div")
-    //           .attr("class", "streams_text_main_div")
-    //           .selectAll("div")
-    //           .data(streams);
+  rearr_grids(grids, items_connected_to, data) {
+    var tmp_position = [];
+    tmp_position[0] = {"x": 0, "y": 0};
+    var i = 0;
+    for (var key in data['items']) {
+      i ++;
+      tmp_position[i] = {"x": -1, "y": -1};
+    }
 
-    // a.enter()
-    //   .append("div")
-    //   .style("width", rect_height - 2 + "px")
-    //   .style("padding-top", height_stream_text_div / 2 + "px")
-    //   .style("padding-bottom", height_stream_text_div / 2 + "px")
-    //   .style("text-align", "center")
-    //   .attr("class", "rotate_270")
-    //   .style("-ms-transform", function(t, e) {
-    //       return "translate(-" + (pad_stream_div - 2) + "px," + (pad_stream_div + 2 * pad_stream_div * e) + "px) rotate(269.9deg)"
-    //   })
-    //   .style("-webkit-transform", function(t, e) {
-    //       return "translate(-" + (pad_stream_div - 2) + "px," + (pad_stream_div + 2 * pad_stream_div * e) + "px) rotate(269.9deg)"
-    //   })
-    //   .style("transform", function(t, e) {
-    //       return "translate(-" + (pad_stream_div) + "px," + (pad_stream_div + 2 * pad_stream_div * e) + "px) rotate(269.9deg)"
-    //   })
-    //   .text(function(t, e) {
-    //       return t
-    //   });
+    for ( var i = 0 ; i < grids.length ; i ++ ) {
+      for ( var j = 0 ; j < grids[i].length ; j ++ ) {
+        if (grids[i][j] != null) {
+          tmp_position[grids[i][j]]["x"] = i;
+          tmp_position[grids[i][j]]["y"] = j;
+        }
+      }
+    }
 
-    // a.exit().remove();
+    for ( var i = 0 ; i < grids.length ; i ++ ) {
+      for ( var j = 0 ; j < grids[i].length ; j ++ ) {
+        if (grids[i][j] != null) {
+          var target_point_arr = items_connected_to[grids[i][j]];
+          for ( var k = 0; k < target_point_arr.length; k ++) {
+            var target_point = target_point_arr[k];
+            // if ( tmp_position[grids[i][j]]["x"] < tmp_position[target_point]["x"]) {
+            if ( tmp_position[grids[i][j]]["y"] <= tmp_position[target_point]["y"]) {
+              var row = tmp_position[target_point]["x"];
+              var col = tmp_position[target_point]["y"];
+              if (this.detect_conflict(i, row, col , grids)) {
+                console.log("x:" + row + "      y" + col);
+                while (this.detect_conflict(i, row, col, grids)) {
+                  col += 1;
+                  
+                }
+                var mid = grids[row][tmp_position[target_point]["y"]];
+                grids[row][tmp_position[target_point]["y"]] = grids[row][col];
+                grids[row][col] = mid;
+              }
+            }
+          }
+          // }
+        }
+      }
+    }
+  }
 
-    $(".streams_text_main_div").css("height", rect_height * streams.length + "px");
-    $("#flowChart_div svg").attr("height", rect_height * streams.length);
+  detect_conflict(source, row, col, grids) {
+    for (var i = source + 1 ; i < row ; i ++ ) {
+      if (grids[i][col] != null)
+        return true;
+    }
+    return false;
   }
 
   elements_locations(grids) {
@@ -321,22 +350,30 @@ class App extends Component {
     var object_items = d3.select("#flowChart_div")
               .select("svg").selectAll("g").data(items);
 
+    var max = 0;
+    for ( var i = 0 ; i < element_loc.length ; i ++ ) {
+      if (element_loc[i] != undefined && element_loc[i] > max) {
+        max = element_loc[i];
+      }
+    }
+    console.log(max);
+    var step = $("#flowChart_div").width() / (max + 1);
+    console.log(step);
+
     object_items=object_items
       .enter()
       .append("g")
       .attr("transform",function(d,i){
         
         stream_level=d.stream-1;
-        
         if(item_x_axis_position_streamWise[stream_level]){
-          item_x_axis_position_streamWise[stream_level]=(300*element_loc[d.id]);
+          item_x_axis_position_streamWise[stream_level]=(step*element_loc[d.id]);
         }
         else{
-          item_x_axis_position_streamWise[stream_level]=(300*element_loc[d.id]);
+          item_x_axis_position_streamWise[stream_level]=(step*element_loc[d.id]);
         }
         
         var tx=item_x_axis_position_streamWise[stream_level];
-        //console.log(tx);
         
         if(d.type.toLowerCase()=="start"||d.type.toLowerCase()=="finish"||d.type.toLowerCase()=="process-simple"){
           return "translate("+(98+tx)+","+((stream_level*rect_height)+25)+")";
@@ -357,9 +394,7 @@ class App extends Component {
         else{
           return 0; 
         }
-      }).on('click',function(d){
-        this.props.nodeCallBack(d)
-      }.bind(this));
+      });
 
     object_items.append("path")
   
@@ -395,6 +430,9 @@ class App extends Component {
       }
       
     })
+    .on('click',function(d){
+        this.props.nodeCallBack(d)
+      }.bind(this))
     .attr("fill", "#fff")
     .style("stroke-width","2px")
     .style("stroke",function(d,i){
@@ -437,62 +475,146 @@ class App extends Component {
   //draws connectors
 
   link_objects(data) {
-    d3.select("svg").append("svg:defs").append("svg:marker").attr("markerUnits", "strokeWidth").attr("id", "arrow_shape").attr("strokeWidth", 12).attr("markerHeight", 12).attr("viewBox", "0 0 12 12").attr("refX", 10).attr("refY", 6).attr("markerWidth", 12).attr("markerHeight", 12).attr("orient", "auto").append("path").attr("d", "M2,2 L10,6 L2,10 L6,6 L2,2").style("fill", "#fff").style("stroke", "#afafaf").style("stroke-width", "0.5");
-    var e = {};
-    d3.selectAll(".objects").each(function(t) {
-      var obj_id = $(this).attr("id"), transform_x_y = $(this).closest("g").attr("transform").replace("translate(", "").replace(")", "").split(","); 
-      e[obj_id] = {
-        height: Number(this.parentNode.getBBox().height),
-        width: Number(this.parentNode.getBBox().width),
-        x: Number(transform_x_y[0]),
-        y: Number(transform_x_y[1])
-      }
+    d3.select("svg").append("svg:defs")
+    .append("svg:marker")
+    .attr("markerUnits","strokeWidth")
+    .attr("id", "arrow_shape")
+    .attr("strokeWidth", 12)
+    .attr("markerHeight", 12)
+    .attr("viewBox", "0 0 12 12")
+    .attr("refX", 10)
+    .attr("refY", 6)
+    .attr("markerWidth", 12)
+    .attr("markerHeight", 12)
+    .attr("orient", "auto")
+    .append("path")
+    .attr("d","M2,1 L2,11 L9,6 L2,1")
+    .style("fill","#fff")
+    .style("stroke","#afafaf")
+    .style("stroke-width","0.5");
+    
+    
+    var object_info={};
+    
+    d3.selectAll('.objects')
+      .each(function(d) { 
+      
+      var obj_id=$(this).attr("id");
+      
+      var transform_x_y=$(this).closest("g").attr("transform").replace("translate(","").replace(")","").split(",");
+      
+      object_info[obj_id]={"height":Number(this.parentNode.getBBox().height),"width":Number(this.parentNode.getBBox().width),"x":Number(transform_x_y[0]),"y":Number(transform_x_y[1])};
+      //object_info.push(fetched_data);
+    
     });
-    for (var r = 0; r < items.length; r++) {
-        var a = "shape_" + items[r].id,
-            s = [];
-        for (var n in items[r].connectors) items[r].connectors.hasOwnProperty(n) && s.push(items[r].connectors[n]);
-        var i = d3.select("svg").selectAll("g.link_from_" + items[r].id).data(s);
-          i.enter()
-            .append("g")
-            .attr("id", function(t) {
-                return "g_link_" + items[r].id + "_" + t.linkTo
-            })
-            .attr("class", "link_from_" + items[r].id)
-            .append("path")
-            .attr("id", function(t) {
-                return "link_" + items[r].id + "_" + t.linkTo
-            })
-            .attr("d", function(t, r) {
-                var s = "shape_" + t.linkTo;
-                if (e[s].x > e[a].x + e[a].width) {
-                    var n = "M" + (Number(e[a].x) + Number(e[a].width)) + "," + (Number(e[a].y) + Number(e[a].height) / 2),
-                        i = "L" + Number(e[s].x) + "," + (Number(e[s].y) + Number(e[s].height) / 2);
-                    return n + i
-                }
-                n = "M" + (Number(e[a].x) + Number(e[a].width) / 2) + "," + (Number(e[a].y) + Number(e[a].height)),
-                    i = "L" + Number(Number(e[s].x) + Number(e[s].width) / 2) + "," + Number(e[s].y);
-                return n + i
-            })
-            .attr("marker-end", "url(#arrow_shape)")
-            .attr("fill", "#000")
-            .style("stroke-width", "2px")
-            .style("stroke", "#afafaf").each(function(t, e) {});
+    
+    
+    for(var i=0;i<items.length;i++){
+      
+      var id="shape_"+items[i].id;
+      
+      
+      
+      var linkToArr=[];
+      for (var key in items[i]['connectors']) {
+        if (items[i]['connectors'].hasOwnProperty(key)) {
+          linkToArr.push(items[i]['connectors'][key]);
+        }
+      }
+      
+      //----------------Links are inserting from here------------------
+      var object_items=d3.select("svg")
+      .selectAll("g.link_from_"+items[i].id)
+      .data(linkToArr);
+      
+      object_items
+      .enter()
+      .append("g")
+      .attr("id",function(d){return "g_link_"+items[i].id+"_"+d.linkTo;})
+      .attr("class","link_from_"+items[i].id)
+      .append("path")
+      .attr("id",function(d){return "link_"+items[i].id+"_"+d.linkTo;})
+      .attr("d",function(d,i){
+        
+        var id2="shape_"+d.linkTo;
+        
+        //console.log(object_info[id2]["x"]+" {{}} " + object_info[id]["x"]+object_info[id]["width"]);
+          
+        if(object_info[id2]["x"]>object_info[id]["x"]+object_info[id]["width"] &&object_info[id2]["y"]>object_info[id]["y"] + object_info[id]["height"]){
 
-        var o = i.enter()
-                  .append("text")
-                  .attr("x", 6)
-                  .attr("dy", -5)
-                  .attr("text-anchor", "middle");
+          var M_line="M"+(Number(object_info[id]["x"])+Number(object_info[id]["width"]))+","+(Number(object_info[id]["y"])+(Number(object_info[id]["height"])/2));
+          
+          var horizontal = "H" + (Number(object_info[id2]["x"]) + Number(object_info[id2]["width"])/2) ;
 
-        o.append("textPath")
-          .attr("startOffset", "45%")
-          .attr("xlink:href", function(t) {
-              return "#link_" + items[r].id + "_" + t.linkTo
-          })
-          .text(function(t) {
-              return t.title
-          })
+          var vertical = "V" + Number(object_info[id2]["y"]);
+
+          return  M_line +" " +  horizontal + " " + vertical;
+
+        }
+        else if (object_info[id2]["x"]>object_info[id]["x"]+object_info[id]["width"] && object_info[id2]["y"] > object_info[id]["y"] - object_info[id]["height"]) {
+          var M_line="M"+(Number(object_info[id]["x"])+Number(object_info[id]["width"]))+","+(Number(object_info[id]["y"])+(Number(object_info[id]["height"])/2));
+          
+          
+          var L_line="H"+Number(object_info[id2]["x"]);
+          return  M_line+L_line;
+        }
+        else if (object_info[id2]["x"] < object_info[id]["x"] - object_info[id]["width"] && object_info[id2]["y"] < object_info[id]["y"] - object_info[id]["height"]) {
+
+          var M_line="M"+(Number(object_info[id]["x"]))+","+(Number(object_info[id]["y"])+(Number(object_info[id]["height"])/2));
+          
+          var horizontal = "H" + (Number(object_info[id2]["x"]) + Number(object_info[id2]["width"])/2) ;
+
+          var vertical = "V" + (Number(object_info[id2]["y"]) + Number(object_info[id2]["height"]));
+
+          return  M_line +" " +  horizontal + " " + vertical;
+        }
+        else if (object_info[id2]["x"] < object_info[id]["x"] - object_info[id]["width"]) {
+          var M_line="M"+(Number(object_info[id]["x"]))+","+(Number(object_info[id]["y"])+(Number(object_info[id]["height"])/2));
+          
+          
+          var L_line="H"+(Number(object_info[id2]["x"]) + +Number(object_info[id2]["width"]));
+          return  M_line+L_line;
+        }
+        if(object_info[id2]["x"]>object_info[id]["x"]+object_info[id]["width"] &&object_info[id2]["y"] < object_info[id]["y"] - object_info[id]["height"]){
+
+          var M_line="M"+(Number(object_info[id]["x"])+Number(object_info[id]["width"]))+","+(Number(object_info[id]["y"])+(Number(object_info[id]["height"])/2));
+          
+          var horizontal = "H" + (Number(object_info[id2]["x"]) + Number(object_info[id2]["width"])/2) ;
+
+          var vertical = "V" + (Number(object_info[id2]["y"]) + Number(object_info[id2]["height"]));
+
+          return  M_line +" " +  horizontal + " " + vertical;
+
+        }
+        else {
+          
+          var M_line="M"+(Number(object_info[id]["x"])+Number(object_info[id]["width"])/2)+","+(Number(object_info[id]["y"])+(Number(object_info[id]["height"])));
+          
+          
+          var L_line="L"+Number(Number(object_info[id2]["x"])+(Number(object_info[id2]["width"])/2))+","+Number(object_info[id2]["y"]);
+          return  M_line+L_line;
+
+        }
+      }) 
+      .attr("marker-end","url(#arrow_shape)")
+      .attr("fill", "none")
+      .style("stroke-width","2px")
+      .style("stroke","#afafaf")
+      .each(function(d,i){
+        
+      });
+      
+      
+      var text = object_items
+      .enter().append("text")
+      .attr("x", 6)
+      .attr("dy", -5)
+    .attr('text-anchor', 'middle');
+
+    text.append("textPath")
+    .attr('startOffset', '45%')
+        .attr("xlink:href",function(d){ return "#link_"+items[i].id+"_"+d.linkTo;})
+        .text(function(d){ return d.title;});
     }
   }
 

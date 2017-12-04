@@ -80,13 +80,6 @@ export default class ProcessMap extends Component {
             href={this.state.modalData.attachment}
             disabled={true}
           />
-          
-          
-          
-
-
-
-
           {/*JSON.stringify(this.state.modalData, null, 2)*/}
         </Modal.Body>
         <Modal.Footer>
@@ -886,7 +879,7 @@ export default class ProcessMap extends Component {
           <Panel className="chartcont modal-container">
             {this.state.modalShow && this.modalView()}
             { this.state.chartState 
-              ? <WorkflowChart id="d3-workflow" data={ this.state.content } key={Math.random()} errorCallBack = {this.errorCallBackFn} nodeCallBack={this.nodeCallBackFn}/> 
+              ? <WorkflowChart id="d3-workflow" data={ this.state.content } nodeCallBack={this.nodeCallBackFn}/> 
               : this.renderPrettyPrint(this.state.content,null,4)}
           </Panel>
         </PanelGroup>

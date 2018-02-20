@@ -1,12 +1,15 @@
 import React, { Component } from "react";
 import { Link, withRouter } from "react-router-dom";
-import { Nav, NavItem, Navbar} from "react-bootstrap";
 import "./App.css";
 import { authUser, signOutUser } from "./libs/awsLib";
 import Footer from "./components/Footer";
 
+import { Layout, Menu, Icon } from 'antd';
+
 import Routes from "./Routes";
-import RouteNavItem from "./components/RouteNavItem";
+
+const { Header, Content } = Layout;
+
 
 class App extends Component {
   constructor(props) {
@@ -56,6 +59,11 @@ class App extends Component {
     this.setState({ alertVisible: false });
   }
 
+  handleNavClick = (e) => {
+    e.preventDefault();
+
+  }
+
   render() {
     const childProps = {
       isAuthenticated: this.state.isAuthenticated,
@@ -65,39 +73,31 @@ class App extends Component {
 
     return (
       !this.state.isAuthenticating &&
-      <div className="App container-fluid">
-        <Navbar fluid collapseOnSelect>
-          <Navbar.Header>
-            <Navbar.Brand>
-              <Link to="/">
-                <strong> flow </strong>
-                <span className="brand-symbol glyphicon glyphicon-random"></span>
-              </Link>
-            </Navbar.Brand>
-            <Navbar.Toggle />
-          </Navbar.Header>
-          <Navbar.Collapse className="navbar-dark bg-dark">
-            <Nav pullRight>
+        <Layout className="App container-fluid"> 
+          <Header style={{ position: 'fixed', width: '100%', background: "white", zIndex: 1000, padding: 0}}>
+            <Menu
+              theme="light"
+              mode="horizontal"
+              defaultSelectedKeys={['2']}
+              style={{ lineHeight: '64px', color: "#1a9ed9", padding: "0px 32px" }}
+            >
+              <Menu.Item key="logo"><Link to="/" style={{color: "#ff8099"}}><Icon type="api" /><strong> flow </strong></Link></Menu.Item> 
               {this.state.isAuthenticated
-                ? [
-                  <RouteNavItem key={2} href="/processmaps"><span className="glyphicon glyphicon-ice-lolly"></span>  Process Maps</RouteNavItem>,
-                  <RouteNavItem key={3} href="/contact"><span className="glyphicon glyphicon-envelope"></span>  Contact</RouteNavItem>,
-                  <RouteNavItem key={4} href="/myprofile"><span className="glyphicon glyphicon-user"></span>  Profile</RouteNavItem>,
-                  <NavItem key={5} onClick={this.handleLogout}><span className="glyphicon glyphicon-log-out"></span>  Logout</NavItem> ]
-                : [
-                  <RouteNavItem key={6} href="/signup">
-                    <strong>Signup</strong>
-                  </RouteNavItem>,
-                  <RouteNavItem key={7} href="/login">
-                    <strong>Login</strong>
-                  </RouteNavItem>
-                ]}
-            </Nav>
-          </Navbar.Collapse>
-        </Navbar>
-        <Routes childProps={childProps} />
-        <Footer />
-      </div>
+                  ? [
+                    <Menu.Item key="1"><Link to="/processmaps"><Icon type="profile" />  Process Maps</Link></Menu.Item>,
+                    //<Menu.Item key="2"><Link to="/contact"><span className="glyphicon glyphicon-envelope"></span>  Contact</Link></Menu.Item>,
+                    <Menu.Item key="3"><Link to="/myprofile"><Icon type="user" /> Profile</Link></Menu.Item>,
+                    <Menu.Item key="logout"><span onClick={this.handleLogout}><Icon type="logout" />  Logout</span></Menu.Item>]
+                  : [
+                    <Menu.Item key="6"><Link to="/signup">Signup</Link></Menu.Item>,
+                    <Menu.Item key="7"><Link to="/login"><Icon type="login" /> Login</Link></Menu.Item>]}
+            </Menu>
+          </Header>
+          <Content style={{ padding: '0 50px', marginTop: 64, minHeight: "100vh" }}>
+            <Routes childProps={childProps} />
+          </Content>
+          <Footer />
+        </Layout>
     );
   }
 }

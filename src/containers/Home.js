@@ -1,9 +1,15 @@
 import React, { Component } from "react";
-import { Image, Form, FormGroup, ControlLabel, FormControl, PanelGroup, Glyphicon, Alert, Jumbotron, Button, PageHeader, ListGroup, ListGroupItem, Grid, Row, Col, Panel, Well } from "react-bootstrap";
+import { Image, Panel, Glyphicon, Alert, Row, Col, Well } from "react-bootstrap";
+
+import { Avatar, Button, Icon, Layout, Collapse, List } from 'antd'
+
+import LoadingSymbol from './../components/LoadingSymbol'
 
 import "./Home.css";
 
 import { invokeApig } from '../libs/awsLib';
+
+const { Sider, Content } = Layout;
 
 export default class Home extends Component {
   constructor(props) {
@@ -84,39 +90,8 @@ export default class Home extends Component {
   renderOutages(outages) {
     return (
       <Panel header={<h3>Service Outages</h3>}>
-        {outages.length > 0 ? [
-          outages[0]
-        ] :
-        [ "No outages have been planned." ]}
+        "No outages have been planned."
       </Panel>
-    );
-  }
-
-  renderLander() {
-    return (
-      <div>
-        <Jumbotron>
-          <div className="Home">
-            <div className="lander">
-              <span style={{'font-size':'1000%', 'color':'#1a9ed9'}}className="brand-symbol glyphicon glyphicon-random"></span>
-              <h1>Lets make some process maps!</h1>
-              <p>Accurate, fast, easy peasey</p>
-              <Button bsSize = 'large' bsStyle="primary" href="/login" onClick={this.handleDatasetClick}>Login</Button>
-            </div>
-          </div>
-        </Jumbotron>
-        <Grid id='lander-options'>
-          <Col xs={12} md={4}>
-            Option 1
-          </Col>
-          <Col xs={12} md={4}>
-            Option 2
-          </Col>
-          <Col xs={12} md={4}>
-            Option 3
-          </Col>
-        </Grid>
-      </div>
     );
   }
 
@@ -127,133 +102,6 @@ export default class Home extends Component {
         </Alert>
       );
   }
-
-  addBar(){
-    return (
-      <Row className = 'no-pad'>
-        <Col className = 'no-pad' xs={12}>
-          <Button id='add-new-map-button' className='full-button' block href="/processmaps/new"
-            onClick={this.handleDatasetClick} bsSize='small'>
-              <strong><span className="glyphicon glyphicon-plus-sign"></span> Create a new process map and share it with anyone</strong> 
-          </Button>
-        </Col>
-      </Row>
-    );
-  }
-
-  renderProcessMapListInner(dataset){
-    return (
-      <Panel collapsible
-        id='process-map-list-item'
-        eventKey={dataset.processMapId}
-        style={{'margin-bottom':'0px'}}
-        key={dataset.processMapId}
-        header={
-          <span>
-            <Button id='go-to-map-button' href={`/processmaps/${dataset.processMapId}`}
-              onClick={this.handleDatasetClick} bsSize='small'>
-              <strong><span className="glyphicon glyphicon-random"> </span> Go to map</strong> 
-            </Button>
-            <small>{dataset.title.trim().split("\n")[0]}</small>
-            <span id='button-holder'>
-              {dataset.isShared && 
-                <Button id='share-map-button' bsStyle="link" bsSize="sm"><Glyphicon glyph="link"/></Button>}
-              <Button id='delete-map-button' bsStyle="link" bsSize="sm"><Glyphicon glyph="trash"/></Button>
-            </span>
-          </span>
-        }
-        className='node-panel process-map-list-item'
-      >
-      <Well className='no-border take-full-width'>
-        <Form horizontal> 
-            <FormGroup controlId="title" bsSize="small">
-              <Col sm={3} componentClass={ControlLabel}>
-                Title
-              </Col>
-              <Col sm={9}>
-                <FormControl
-                    autoFocus
-                    type="name"
-                    value={dataset.title}
-                    disabled={true}
-                />
-              </Col>
-            </FormGroup>    
-            <FormGroup controlId="description" bsSize="small">
-              <Col sm={3} componentClass={ControlLabel}>
-                Description
-              </Col>
-              <Col sm={9}>
-                <FormControl
-                  componentClass="textarea"
-                  value={dataset.description}
-                  disabled={true}
-                />
-              </Col>
-            </FormGroup>
-            <FormGroup controlId="createdAt" bsSize="small">
-              <Col sm={3} componentClass={ControlLabel}>
-                Created at
-              </Col>
-              <Col sm={9}>
-                <FormControl
-                  componentClass="textarea"
-                  value={new Date(dataset.createdAt).toLocaleString()}
-                  disabled={true}
-                />
-              </Col>
-            </FormGroup>
-            {dataset.isShared}
-            <FormGroup controlId="isShared" bsSize="small">
-              <Col sm={3} componentClass={ControlLabel}>
-                Is shared?
-              </Col>
-              <Col sm={9}>
-                <FormControl
-                  componentClass="textarea"
-                  value={dataset.isShared ? 'Yes' : 'No'}
-                  disabled={true}
-                />
-              </Col>
-            </FormGroup>
-            <FormGroup controlId="lastShared" bsSize="small">
-              <Col sm={3} componentClass={ControlLabel}>
-                Last shared on:
-              </Col>
-              <Col sm={9}>
-                <FormControl
-                  componentClass="textarea"
-                  value={dataset.lastShared}
-                  disabled={true}
-                />
-              </Col>
-            </FormGroup>
-            <FormGroup controlId="shareLink" bsSize="small">
-              <Col sm={3} componentClass={ControlLabel}>
-                Share link:
-              </Col>
-              <Col sm={9}>
-                <FormControl
-                  componentClass="textarea"
-                  value={dataset.sharedLinkCode}
-                  disabled={true}
-                />
-              </Col>
-            </FormGroup>
-          </Form>
-        </Well>
-      </Panel>
-    );
-  }
-
-  renderDatasetsList(datasets) {
-    return [{}].concat(datasets).sort(function(b,a) {return a.createdAt - b.createdAt}).map(
-      (dataset, i) =>
-        i !== 0
-          ? this.renderProcessMapListInner(datasets[i-1])
-          : this.addBar()
-    );
-  }
   
   handleDatasetClick = event => {
     event.preventDefault();
@@ -261,15 +109,15 @@ export default class Home extends Component {
   }
 
   controlSection(){
+      const ColPanel = Collapse.Panel;
+
       return (
-          <Col xs={12} sm={12} className="sidebar home-sidebar">
-              <PanelGroup accordion className = "sidebar-contents" bsStyle={this.state.isUnsaved !== false ? 'danger' : 'default'}>
-                <Panel className='control-choice' header={<span><small><span className="glyphicon glyphicon-question-sign"></span> Help</small></span>} eventKey='0'>{this.renderHelp()}</Panel>
-                <Panel className='control-choice' header={<span><small><span className="glyphicon glyphicon-bullhorn"></span> News</small></span>} eventKey='1'>{this.renderNews(this.state.news)}</Panel>
-                <Panel className='control-choice'  header={<span><small><span className="glyphicon glyphicon-flash"></span> Planned Outages </small></span>} eventKey="2">{this.renderOutages()}</Panel>
-                <Panel className='control-choice'  header={<span><small><span className="glyphicon glyphicon-heart-empty"></span> Process Map of the Week</small></span>} eventKey='3'></Panel>
-              </PanelGroup>
-          </Col>
+        <Collapse bordered={false}>
+          <ColPanel header={<span style={{paddingLeft: "10px"}}><small><span className="glyphicon glyphicon-question-sign" style={{color: "FF8099", marginRight: "10px"}}></span> Help</small></span>} eventKey='0'>{this.renderHelp()}</ColPanel>
+          <ColPanel header={<span style={{paddingLeft: "10px"}}><small><span className="glyphicon glyphicon-bullhorn" style={{color: "FF8099", marginRight: "10px"}}></span> News</small></span>} eventKey='1'>{this.renderNews(this.state.news)}</ColPanel>
+          <ColPanel header={<span style={{paddingLeft: "10px"}}><small><span className="glyphicon glyphicon-flash" style={{color: "FF8099", marginRight: "10px"}}></span> Planned Outages </small></span>} eventKey="2">{this.renderOutages()}</ColPanel>
+          <ColPanel header={<span style={{paddingLeft: "10px"}}><small><span className="glyphicon glyphicon-heart-empty" style={{color: "FF8099", marginRight: "10px"}}></span> Process Map of the Week</small></span>} eventKey='3'>{this.renderOutages()}</ColPanel>
+        </Collapse>
       )
   }
 
@@ -279,36 +127,62 @@ export default class Home extends Component {
     );
   }
 
-  renderOutages(){
-    return (
-      <Well>{"No planned outages."}</Well>
-    );
-  }
 
   renderHelp(){
     return (
       <Image key = {Math.random()} responsive src="https://source.unsplash.com/random/600x400" />
     );
   }
+  
 
   renderProcessMapList() {
+
+    const ListItem = (props) => 
+      <List.Item 
+        actions={[
+          <Avatar icon="link" style={{ color: '#fff', backgroundColor: props.data.isShared?'#66bf80':"#7a8f99" }}/>,
+          <CustomButtonSmall 
+            text={<strong><Icon type="api"/> Go to map</strong>} 
+            secondary
+            onClick={this.handleDatasetClick} 
+            href={`/processmaps/${props.data.processMapId}`} />,
+            <Avatar disabled icon="delete" style={{ color: '#fff', backgroundColor: '#bf0000' }}/>]}
+        >
+          <List.Item.Meta
+            avatar={<Avatar icon="api" style={{ color: '#fff', backgroundColor: '#ff8099' }}/>}
+            title={props.data.title}
+            description={props.data.description}
+          />
+          <div>{new Date(props.data.createdAt).toLocaleString()}</div>
+      </List.Item>
+
     return (
-      <div className="datasets">
+      <div className="main-wrapper">
         {this.state.isError ? this.renderUpperAlert() : null}
           { !this.state.isFetching&&!this.state.isLoading
-            ? 
-            <Row className="show-grid">
-              <Col xs={12} md={4} id='control-section'> 
-                {this.controlSection()}
-              </Col> 
-              <Col xs={12} sm={8} className="sidebar">
-                <ListGroup>
-                  {this.renderDatasetsList(this.state.datasets)}
-                </ListGroup>
-              </Col>
-            </Row>
-            :
-            this.loadingSymbol()
+            ? <Layout style={{ minHeight: '100vh'}}>
+                <Sider width={300} style={{background: "#fff", paddingLeft: "10px"}}>
+                  {this.controlSection()}
+                </Sider>
+                <Content style={{marginTop: 10, marginRight: 30}}>
+                  <div style={{float: "right", marginBottom: "10px"}}>
+                      <CustomButtonSmall
+                        secondary 
+                        onClick={e => this.props.history.push("/processmaps/new")}
+                        text={<span><Icon type="plus-circle" /> Create New</span>}/>
+                  </div>
+                  <div style={{margin: 24, marginTop: 50, padding: 24, background: "#fff"}}>
+                    <List 
+                      style={{width: "100%"}}
+                      fill
+                      dataSource={this.state.datasets.sort(function(b,a) {return a.createdAt - b.createdAt})}
+                      renderItem={item => 
+                        <ListItem data={item}/>
+                    }/>
+                  </div>
+                </Content>
+              </Layout>
+            : <LoadingSymbol />
             }
       </div>
     );
@@ -317,14 +191,187 @@ export default class Home extends Component {
   render() {
     return (
       <div className="Home">
-        <Grid fluid={true}>
           {this.props.isAuthenticated ? 
-            <Row className="show-grid">
-              {this.renderProcessMapList()}
-            </Row>
-          : this.renderLander()}
-        </Grid>
+            this.renderProcessMapList()
+          : <LanderHome history={this.props.history}/>}
       </div>
     );
+  }
+}
+
+class LanderHome extends Component {
+  render() {
+    return (
+      <div className="main-wrapper">
+        <div className="landing-content-container" style={{display: "flex", flexDirection: "row-reverse", alignContent: "center", alignItems: "center", justifyContent: "center", paddingLeft: "100px"}}>
+          <div className="icon-wrapper" style={{width: "600px", textAlign: "center"}}>
+            <SpinnerLogo />
+          </div>
+          <div className="text-wrapper" style={{maxWidth: "600px"}}>         
+            <h1 style={{fontSize: "400%", fontWeight: "400", color: "white"}}>
+              Let's make some process maps!
+            </h1>
+            <h3 style={{ fontWeight: "100", fontSize:"200%", color: "white"}}>
+              Accurate, fast, flexible, shareable.
+            </h3>
+            <Row style={{display: "flex", flexWrap: "wrap", alignItems: "center", marginTop: "50px"}}>
+              <CustomButton 
+                onClick={e => this.props.history.push("/login")} 
+                text="Login"/>
+              <CustomButton 
+                secondary
+                onClick={e => this.props.history.push("/signup")} 
+                text="Signup Now"/>
+            </Row>
+          </div>
+        </div>
+      </div>
+    )
+  }
+}
+
+
+class SpinnerLogo extends Component {
+  constructor(props){
+    super(props)
+    this.state = {
+      isHovered: false
+    }
+  }
+  render() {
+    return (
+      <Icon 
+        onMouseOver={e => this.setState({isHovered: true})}
+        onMouseLeave={e => this.setState({isHovered: false})}
+        style={{color: "white", fontSize: "2000%"}} 
+        type="api" />
+    )
+  }
+}
+
+class CustomButton extends Component {
+  constructor(props){
+    super(props)
+    this.state= {
+      isHovered : false
+    }
+  }
+
+  render(){
+    const baseStyle = 
+      {
+        width: 250, 
+        height: 50, 
+        borderRadius: "40px", 
+        background: "none", 
+        borderColor: "#ff8099", 
+        color: "#ff8099", 
+        fontSize: "150%", 
+        fontWeight: "300", 
+        lineHeight: "40px",
+        margin: "auto"
+      }
+
+    const secondaryStyle = 
+      { 
+        ...baseStyle,
+        background: "#ff8099", 
+        borderColor: "#ff8099", 
+        color: "#fff", 
+      }
+
+    const baseHover = {
+      ...baseStyle,
+      width: 255,
+      height: 55,
+      borderColor: "#fff", 
+      color: "#fff", 
+    }
+
+    const secondaryHover = {
+      ...secondaryStyle,
+      width: 255,
+      height: 55,
+      background: "#fff", 
+      borderColor: "#fff", 
+      color: "#ff8099", 
+    }
+
+    const buttonStyle = !this.props.secondary?baseStyle:secondaryStyle
+    const hoverStyle = !this.props.secondary?baseHover:secondaryHover
+
+    return (
+      <div style={{width: 260, height: 60}}>
+        <Button 
+          onMouseOver = {e => this.setState({ isHovered: true})} 
+          onMouseLeave = {e => this.setState({ isHovered: false})} 
+          onClick = {this.props.onClick}
+          style={!this.state.isHovered?buttonStyle:hoverStyle} 
+          >
+          {this.props.text}
+        </Button>
+      </div>
+    )
+  }
+}
+
+class CustomButtonSmall extends Component {
+  constructor(props){
+    super(props)
+    this.state= {
+      isHovered : false
+    }
+  }
+
+  render(){
+    const baseStyle = 
+      {
+        height: 32, 
+        borderRadius: "32px", 
+        background: "none", 
+        borderColor: "#ff8099", 
+        color: "#ff8099", 
+        fontWeight: "300", 
+        lineHeight: "32px",
+        margin: "auto"
+      }
+
+    const secondaryStyle = 
+      { 
+        ...baseStyle,
+        background: "#ff8099", 
+        borderColor: "#ff8099", 
+        color: "#fff", 
+      }
+
+    const baseHover = {
+      ...baseStyle,
+      borderColor: "#fff", 
+      color: "#fff", 
+    }
+
+    const secondaryHover = {
+      ...secondaryStyle,
+      background: "#fff", 
+      borderColor: "#fff", 
+      color: "#ff8099", 
+    }
+
+    const buttonStyle = !this.props.secondary?baseStyle:secondaryStyle
+    const hoverStyle = !this.props.secondary?baseHover:secondaryHover
+
+    return (
+      <div style={{height: 32}}>
+        <Button 
+          onMouseOver = {e => this.setState({ isHovered: true})} 
+          onMouseLeave = {e => this.setState({ isHovered: false})} 
+          onClick = {this.props.onClick}
+          style={!this.state.isHovered?buttonStyle:hoverStyle} 
+          href={this.props.href?this.props.href:null}
+          >
+          {this.props.text}
+        </Button>
+      </div>
+    )
   }
 }

@@ -1,18 +1,21 @@
 import React, { Component } from 'react';
 import "./Footer.css";
 
+import { Layout } from 'antd';
+const { Footer } = Layout;
+
+
  
-export default class Footer extends Component {
+export default class FooterOut extends Component {
 
     render () {
         let today = new Date();
         let year = today.getFullYear();
         
         return (
-            <footer className="footer">
-                <span id='companyname' >grosvenor<strong className='blue-text'>.digital</strong></span>
-                <span id='copyright' ><small><span className="glyphicon glyphicon-copyright-mark"></span> copyright {year}</small></span>
-            </footer>
+            <Footer style={{ textAlign: 'center', background: "#ff8099", color: "white" }}>
+                <span id='companyname' >grosvenor<strong className='blue-text'>.digital</strong></span> <small><span className="glyphicon glyphicon-copyright-mark"></span> copyright {year}</small>
+            </Footer>
         )
 
     }

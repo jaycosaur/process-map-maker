@@ -1,11 +1,17 @@
 import React, { Component } from "react";
-import { Modal, Glyphicon, Form, Well, InputGroup, Button, FormGroup, FormControl, ControlLabel, HelpBlock, Grid, Row, Col, PanelGroup,Panel } from "react-bootstrap";
+import { Modal, Glyphicon, Form, Well, InputGroup, Button, FormGroup, FormControl, ControlLabel, HelpBlock, Row, Col} from "react-bootstrap";
 import LoaderButton from "../components/LoaderButton";
 import "./ProcessMaps.css";
-import config from "../config";
-import { invokeApig, s3Upload } from "../libs/awsLib";
+import { invokeApig } from "../libs/awsLib";
 import Progress from 'react-progress';
 import WorkflowChart from '../components/WorkflowChart';
+import LoadingSymbol from './../components/LoadingSymbol'
+
+import { message, Layout, Menu, Card, Icon, Collapse } from 'antd';
+const { Content, Sider } = Layout;
+const SubMenu = Menu.SubMenu;
+const Panel = Collapse.Panel
+
 
 export default class ProcessMap extends Component {
   constructor(props) {
@@ -25,12 +31,19 @@ export default class ProcessMap extends Component {
       uploadProgress: 0,
       newStream: "",
       hideEditPane: false,
-      chartState: false,
+      chartState: true,
       modalData: null,
-      modalShow: false
+      modalShow: false,
+      devMode: false,
+      collapsed: false,
     };
     this.nodeCallBackFn = this.nodeCallBackFn.bind(this);
     this.modalCallBack = this.modalCallBack.bind(this);
+  }
+
+  onCollapse = (collapsed) => {
+    console.log(collapsed);
+    this.setState({ collapsed });
   }
 
   modalView(){
@@ -142,6 +155,7 @@ export default class ProcessMap extends Component {
       alert(e);
       this.setState({ isLoading: false });
     }
+    message.success('Process map saved!');
   }
 
   deleteProcessMap() {
@@ -190,6 +204,7 @@ export default class ProcessMap extends Component {
         description: this.state.description,
         content: JSON.stringify(this.state.content)
       });
+      message.success('Process map has been shared!')
       this.setState({
         isShared: true,
         sharedLinkCode: response.shareId,
@@ -218,6 +233,7 @@ export default class ProcessMap extends Component {
         description: this.state.description,
         content: JSON.stringify(this.state.content)
       });
+      message.success('Successfully updated share!')
       this.setState({
         isShared: true,
         sharedLinkCode: response.shareId,
@@ -243,7 +259,8 @@ export default class ProcessMap extends Component {
         await this.disableShare({
           id: this.props.match.params.id,
           shareId: this.state.sharedLinkCode
-      });
+        });
+        message.success('Successfully deleted share!')
         this.setState({
           isShared: false,
           sharedLinkCode: null,
@@ -270,6 +287,7 @@ export default class ProcessMap extends Component {
 
   errorCallBackFn  = (e) => {
     console.log(e);
+    message.error("You have made an error! Please refresh the page")
   }
 
   updateProgress = (dataFromUpload) => {     
@@ -361,6 +379,7 @@ export default class ProcessMap extends Component {
       isUnsaved: true,      
       content: content
     });
+    message.success('Connecter has been added!')
   }
 
   addNode = async event => {
@@ -382,6 +401,7 @@ export default class ProcessMap extends Component {
             }
           }
       } 
+    message.success('Node has been added!')
     this.setState({
       content: content,
       isUnsaved: true,
@@ -401,6 +421,7 @@ export default class ProcessMap extends Component {
       content: content,
       isUnsaved: true,
     });
+    message.success('Node has been deleted!')
   }
 
   deleteConnector(i, c, e){
@@ -421,6 +442,7 @@ export default class ProcessMap extends Component {
       content: content,
       isUnsaved: true,
     });
+    message.success('Connector has been deleted!')
   }
 
   handleConnectorChange(connectorId,nodeId,e) {
@@ -467,6 +489,7 @@ export default class ProcessMap extends Component {
       content: content,
       isUnsaved: true,
     });
+    message.success('Successfully deleted Stream!')
   }
   
   handleSubmitStreamEdit = async event => {
@@ -489,7 +512,7 @@ export default class ProcessMap extends Component {
       newStream: "",
       isUnsaved: true,
     });
-
+    message.success('Stream has been added!');
   }
 
   renderPropertyPane() {
@@ -565,59 +588,65 @@ export default class ProcessMap extends Component {
 
   renderStreamPane(streams) {
     var streamArray = Object.keys(streams).map((key) => [Number(key), streams[key]])
-    return [{}].concat(streamArray).map(
-      (stream, i) =>
-        i !== 0
-          ? 
-            this.renderStream(stream[0],stream[1])
-          : 
-              <form key={i} id='new-stream-form' onSubmit={this.handleSubmitStreamEdit}>
-                <FormGroup key={1} controlId="newStream" bsSize="small">
-                  <InputGroup>
-                    <InputGroup.Addon
-                      onClick={this.validateNewStreamForm() ? this.handleSubmitStreamEdit : null}
-                      >
-                      <span id="new-stream-add-button" style={{color: '#1a9ed9'}}className={this.validateNewStreamForm() ? "glyphicon glyphicon-plus" : "glyphicon glyphicon-flash"}></span>
-                    </InputGroup.Addon>
-                    <FormControl
-                      autoFocus
-                      type="name"
-                      value={this.state.newStream}
-                      placeholder="New stream title"
-                      onChange={this.handleChange}
-                      />
-                  </InputGroup>
-                </FormGroup>   
-              </form>
-    );
+    return (
+      <Collapse style={{maxWidth: 400}}>
+        {[{}].concat(streamArray).map(
+          (stream, i) =>
+            i !== 0
+              ? 
+                this.renderStream(stream[0],stream[1])
+              : 
+                  <form key={i} id='new-stream-form' onSubmit={this.handleSubmitStreamEdit}>
+                    <FormGroup key={1} controlId="newStream" bsSize="small">
+                      <InputGroup>
+                        <InputGroup.Addon
+                          onClick={this.validateNewStreamForm() ? this.handleSubmitStreamEdit : null}
+                          >
+                          <span id="new-stream-add-button" style={{color: '#1a9ed9'}}className={this.validateNewStreamForm() ? "glyphicon glyphicon-plus" : "glyphicon glyphicon-flash"}></span>
+                        </InputGroup.Addon>
+                        <FormControl
+                          autoFocus
+                          type="name"
+                          value={this.state.newStream}
+                          placeholder="New stream title"
+                          onChange={this.handleChange}
+                          />
+                      </InputGroup>
+                    </FormGroup>   
+                  </form>
+        )}
+      </Collapse>
+    )
+    
+    
   }
  
   renderAddNewItemControl() {
     return (
-      <Button id = 'add-node-button' onClick={this.addNode} bsStyle="link" bsSize="xs">
-        <Glyphicon glyph="plus-sign"/>
-      </Button>                
+      <Icon type="plus-circle" onClick={this.addNode} />         
     );
   }
 
   renderAddNewConnectorControl(id) {
     return (
-      <Button key={id} id='add-connector-button' onClick={this.addConnector.bind(this,id)} bsStyle="link" bsSize="xs">
-        <Glyphicon glyph="plus-sign"/>
-      </Button>     
+      <Icon type="plus-circle" style={{color: "#008F09"}} onClick={this.addConnector.bind(this,id)} />
     );
   }
   
   renderItemsPane(content) {
     var contentArray = Object.keys(content.items).map((key) => [Number(key), content.items[key]])    
-    return [{}].concat(contentArray).map(
-      (item, i) =>
-        i === 0
-          ? 
-            null
-          : 
-            this.renderItem(item[1])
-    );
+    return (
+      <Collapse>
+       {[{}].concat(contentArray).map(
+        (item, i) =>
+          i === 0
+            ? 
+              null
+            : 
+              this.renderItem(item[1])
+      )}
+      </Collapse>
+    )
   }
 
   renderItem(item) {
@@ -697,11 +726,11 @@ export default class ProcessMap extends Component {
               </Col>
             </FormGroup>
           </Form>
-          <Panel collapsible bsStyle='info' header={<span><small>Connectors {this.renderAddNewConnectorControl(item.id)}</small></span>}>
-            <PanelGroup>
+          <Card title={<span><small>Connectors</small></span>} extra={this.renderAddNewConnectorControl(item.id)}>
+            <Collapse>
               {this.renderConnectors(item.connectors, item.id)}
-            </PanelGroup>
-          </Panel>
+            </Collapse>
+          </Card>
         </Well>
       </Panel>
     );
@@ -783,7 +812,7 @@ export default class ProcessMap extends Component {
 
   renderSharePane(){
     return(
-      <form>    
+      <form style={{maxWidth: 400}}>    
         <FormGroup bsSize="small">
           <ControlLabel><small>{this.state.isShared ? `Currently Shared (since ${new Date(this.state.lastShared).toLocaleString()})` : 'Not Shared' }</small></ControlLabel>
           {this.state.isShared 
@@ -833,7 +862,7 @@ export default class ProcessMap extends Component {
           <Button className='full-button' block onClick={this.handleControlToggle} bsSize='small'> <strong><span className="glyphicon glyphicon-cog"></span> {this.state.hideEditPane ? 'Show' : 'Hide'} Controls</strong> </Button>
         </Col>
         <Col className = 'no-pad' xs={6}>
-          <Button className='full-button' block onClick={this.handleChartToggle} bsSize='small'> <strong><span className="glyphicon glyphicon-th-list"></span> {this.state.chartState ? 'Hide' : 'Show'} Chart</strong> </Button>
+          <Button disabled={!this.state.devMode} className='full-button' block onClick={this.handleChartToggle} bsSize='small'> <strong><span className="glyphicon glyphicon-th-list"></span> {this.state.chartState ? 'Hide' : 'Show'} Chart</strong> </Button>
         </Col>
       </Row>
     );
@@ -845,59 +874,81 @@ export default class ProcessMap extends Component {
     );
   }
 
-  controlSection(width){
-      return (
-        this.state.hideEditPane ? null :
-          <Col xs={12} sm={width} className="sidebar">
-              { this.hideBar() }
-              <PanelGroup accordion className = "sidebar-contents" bsStyle={this.state.isUnsaved !== false ? 'danger' : 'default'}>
-                <Panel className='control-choice' header={<span><small><span className="glyphicon glyphicon-th-large"></span> Properties</small></span>} eventKey='1'>{this.renderPropertyPane()}</Panel>
-                <Panel className='control-choice'  header={<span><small><span id={this.state.isShared ? 'share-icon' : 'not-share-icon'} className="glyphicon glyphicon-link"></span> Share Process Map </small></span>} eventKey="2">
-                  {this.renderSharePane()}
-                </Panel>
-                <Panel className='control-choice'  header={<span><small><span className="glyphicon glyphicon-object-align-horizontal"></span> Streams</small></span>} eventKey='3'>{this.renderStreamPane(this.state.content.streams)}</Panel>
-                <Panel className='control-choice'  header={<span><small><span className="glyphicon glyphicon-list"></span> Nodes {this.renderAddNewItemControl()}</small></span>} eventKey='4'>{this.renderItemsPane(this.state.content)}</Panel>
-              </PanelGroup>
-          </Col>
-      )
-  } 
-
-
-
   renderPrettyPrint(objs){
       return (
         <pre><code><div dangerouslySetInnerHTML={{ __html: JSON.stringify(objs, null, 2)}} /></code></pre>
       )
   };
 
-  renderChartPane(width){
+  renderChartPane(){
     return(
-      <Col xs={12} sm={width} className = 'no-pad'>
-        <PanelGroup className="viz">
-          { this.state.isUnsaved !== false ? this.unsavedAlert() : null }
+        <div className="viz">
           {this.state.hideEditPane ? this.hideBar() : null}
-          <Panel className="chartcont modal-container">
+          <div className="chartcont modal-container">
             {this.state.modalShow && this.modalView()}
             { this.state.chartState 
-              ? <WorkflowChart id="d3-workflow" data={ this.state.content } nodeCallBack={this.nodeCallBackFn}/> 
+              ? <WorkflowChart key={Math.random()} id="d3-workflow" data={ this.state.content } errorCallBack={this.errorCallBackFn} nodeCallBack={this.nodeCallBackFn}/> 
               : this.renderPrettyPrint(this.state.content,null,4)}
-          </Panel>
-        </PanelGroup>
-      </Col>
+          </div>
+        </div>
     )
   };
 
   render() {
       return (
-        <div className="NewProcessMaps">
+        <div className="process-map-container">
           <Progress height="3" color="#1a9ed9" percent={this.state.uploadProgress} />
-          {this.state.processMap &&
-          <Grid fluid={true}>
-            <Row className="show-grid">
-              {this.state.hideEditPane ? null : this.controlSection(4)}
-              {this.renderChartPane(this.state.hideEditPane ? 12 : 8)}
-            </Row>
-          </Grid>}
+          {this.state.processMap?
+          <Layout style={{ minHeight: '100vh' }}>
+          <Sider
+            collapsible
+            collapsed={this.state.collapsed}
+            onCollapse={this.onCollapse}
+            width={400}
+            style={{background: "white"}}
+          >
+            { this.state.isUnsaved !== false 
+              
+              ? this.unsavedAlert() : null
+            }
+            <Menu theme="light" defaultSelectedKeys={['1']} mode="inline">
+              <SubMenu
+                key="properties"
+                title={<span><Icon type="appstore" /><span>Properties</span></span>}
+                >
+                <Card>{this.renderPropertyPane()}</Card>
+              </SubMenu>
+              <SubMenu
+                key="share"
+                title={<span>{this.state.isShared?<Icon type="link" />:<Icon type="share-alt" />}<span>Share</span></span>}
+                >
+                <Card>{this.renderSharePane()}</Card>
+              </SubMenu>
+              <SubMenu
+                key="streams"
+                title={<span><Icon type="layout" /><span>Streams</span></span>}
+                >
+                <Card>{this.renderStreamPane(this.state.content.streams)}</Card>
+              </SubMenu>
+              <SubMenu
+                key="nodes"
+                title={<span><Icon type="bars" /><span>Nodes {this.renderAddNewItemControl()}</span></span>}
+                >
+                <Card>{this.renderItemsPane(this.state.content)}</Card>
+              </SubMenu>
+            </Menu>
+          </Sider>
+          <Layout>
+            <Content style={{ margin: '16px' }}>
+              <div style={{ background: '#fff', minHeight: 360 }}>
+                {this.renderChartPane()}
+              </div>
+            </Content>
+          </Layout>
+        </Layout>
+          :
+          <LoadingSymbol /> 
+        }
         </div>
       )
     }

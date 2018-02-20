@@ -1,15 +1,19 @@
 import React, { Component } from "react";
-import { FormGroup, FormControl } from "react-bootstrap";
-import LoaderButton from "../components/LoaderButton";
 import {
   CognitoUserPool,
   AuthenticationDetails,
   CognitoUser
 } from "amazon-cognito-identity-js";
 
+import { Form, Icon, Input, Button } from 'antd';
+import { Link } from 'react-router-dom'
+
 import "./Login.css";
 
 import config from "../config";
+
+const FormItem = Form.Item;
+
 
 export default class Login extends Component {
   constructor(props) {
@@ -49,13 +53,11 @@ export default class Login extends Component {
     });
   }
 
-  handleSubmit = async event => {
-    event.preventDefault();
-
+  handleSubmit = async (formInputs) => {
     this.setState({ isLoading: true });    
   
     try {
-      await this.login(this.state.email, this.state.password);
+      await this.login(formInputs.email, formInputs.password);
       this.props.userHasAuthenticated(true);
     } catch (e) {
       alert(e);
@@ -66,40 +68,117 @@ export default class Login extends Component {
   render() {
     return (
       <div className="Login">
-        <form onSubmit={this.handleSubmit}>
-          <FormGroup controlId="email" bsSize="lg">
-            <h1 style={{'padding-bottom': '20px', 'text-align': 'center', 'font-size': '600%', 'color':'#1a9ed9'}}>
-              <span className="brand-symbol glyphicon glyphicon-random"></span>
-            </h1>
-            <FormControl
-              placeholder='email'
-              autoFocus
-              type="email"
-              value={this.state.email}
-              onChange={this.handleChange}
-            />
-          </FormGroup>
-          <FormGroup controlId="password" bsSize="lg">
-            <FormControl
-              placeholder='password'                            
-              value={this.state.password}
-              onChange={this.handleChange}
-              type="password"
-            />
-            <a style={{'margin-top':'10px'}} href="/login/resetpassword">Forgot password?</a>
-          </FormGroup>
-          <LoaderButton
-            block
-            bsSize="large"
-            bsStyle='primary'
-            disabled={!this.validateForm()}
-            type="submit"
-            isLoading={this.state.isLoading}
-            text="Login"
-            loadingText="Logging in…"
-          />
-        </form>
+        <h1 style={{marginTop: "20px", 'text-align': 'center', 'font-size': '800%', 'color':'#fff'}}>
+          <Icon type="api" spin={this.state.isLoading}/>
+        </h1>
+        < WrappedNormalLoginForm 
+          handleSubmit = {this.handleSubmit} />
       </div>
     );
   }
 }
+
+class NormalLoginForm extends React.Component {
+  handleSubmit = (e) => {
+    e.preventDefault();
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+        console.log('Received values of form: ', values);
+        this.props.handleSubmit(values)
+      }
+    });
+  }
+  render() {
+    const { getFieldDecorator } = this.props.form;
+    return (
+      <Form onSubmit={this.handleSubmit} className="login-form">
+        <h1 style={{color: "white", paddingBottom: 10, fontWeight: 200}}>Login</h1>
+        <FormItem>
+          {getFieldDecorator('email', {
+            rules: [{ required: true, message: 'Please input your email!' }],
+          })(
+            <Input size="large" type="email" prefix={<Icon type="mail" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Email" />
+          )}
+        </FormItem>
+        <FormItem>
+          {getFieldDecorator('password', {
+            rules: [{ required: true, message: 'Please input your Password!' }],
+          })(
+            <Input size="large" prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="Password" />
+          )}
+          <Link to='/login/resetpassword' style= {{color: "white"}}>Forgot password</Link>
+        </FormItem>
+        <FormItem>
+          <div style={{display: "flex"}}>
+            <CustomButton htmlType="submit" text="Login" />
+            <CustomButton secondary text={<Link to='/signup'>Register Now</Link>} />
+          </div>
+        </FormItem>
+      </Form>
+    );
+  }
+}
+
+const WrappedNormalLoginForm = Form.create()(NormalLoginForm);
+
+class CustomButton extends Component {
+  constructor(props){
+    super(props)
+    this.state= {
+      isHovered : false
+    }
+  }
+
+  render(){
+    const baseStyle = 
+      {
+        width: 150, 
+        height: 40, 
+        borderRadius: "40px", 
+        background: "none", 
+        borderColor: "#ff8099", 
+        color: "#ff8099", 
+        fontSize: "120%", 
+        fontWeight: "300", 
+        lineHeight: "40px",
+        margin: "auto"
+      }
+
+    const secondaryStyle = 
+      { 
+        ...baseStyle,
+        background: "#ff8099", 
+        borderColor: "#ff8099", 
+        color: "#fff", 
+      }
+
+    const baseHover = {
+      ...baseStyle,
+      borderColor: "#fff", 
+      color: "#fff", 
+    }
+
+    const secondaryHover = {
+      ...secondaryStyle,
+      background: "#fff", 
+      borderColor: "#fff", 
+      color: "#ff8099", 
+    }
+
+    const buttonStyle = !this.props.secondary?baseStyle:secondaryStyle
+    const hoverStyle = !this.props.secondary?baseHover:secondaryHover
+
+    return (
+        <Button 
+          onMouseOver = {e => this.setState({ isHovered: true})} 
+          onMouseLeave = {e => this.setState({ isHovered: false})} 
+          onClick = {this.props.onClick}
+          style={!this.state.isHovered?buttonStyle:hoverStyle} 
+          htmlType = {this.props.htmlType}
+          >
+          {this.props.text}
+        </Button>
+    )
+  }
+}
+

@@ -1,5 +1,12 @@
-.NewProcessMaps {
-  margin-top: -20px;
+
+.process-map-container {
+  margin: 0 -50px;
+  min-height: 100vh;
+}
+
+.ant-layout-sider-trigger {
+  background: #ff8099;
+  color: white
 }
 
 .NewProcessMaps form {

@@ -1,6 +1,18 @@
 @media all and (min-width: 480px) {
-    .MyProfile form {
-      margin: 0 auto;
-      max-width: 320px;
-    }
+  .MyProfile {
+    padding: 30px 60px ;
   }
+}
+
+.MyProfile {
+  padding-top: 30px;
+  padding-bottom: 30px;
+  margin: 0 -58px;
+  min-height: 100vh;
+  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#1a9ed9+17,ff8099+100 */
+  background: #1a9ed9; /* Old browsers */
+  background: -moz-linear-gradient(45deg, #1a9ed9 17%, #ff8099 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(45deg, #1a9ed9 17%,#ff8099 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(45deg, #1a9ed9 17%,#ff8099 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1a9ed9', endColorstr='#ff8099',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+}

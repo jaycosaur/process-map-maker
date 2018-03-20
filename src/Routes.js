@@ -14,6 +14,7 @@ import Contact from "./containers/Contact";
 import MyProfile from "./containers/MyProfile";
 import ResetPassword from "./containers/ResetPassword";
 import Shared from "./containers/Shared";
+import CustomDiagram from "./containers/Diagram/"
 
 
 import NotFound from "./containers/NotFound";
@@ -24,6 +25,7 @@ export default ({ childProps }) =>
     <UnauthenticatedRoute path="/login" exact component={Login} props={childProps} />
     <UnauthenticatedRoute path="/login/resetpassword" exact component={ResetPassword} props={childProps} />
     <UnauthenticatedRoute path="/signup" exact component={Signup} props={childProps}/>
+    <UnauthenticatedRoute path="/diagram" exact component={CustomDiagram} props={childProps} />
     <AuthenticatedRoute path="/processmaps" exact component={Home} props={childProps} />
     <AuthenticatedRoute path="/processmaps/new" exact component={NewProcessMap} props={childProps} />
     <AuthenticatedRoute path="/processmaps/:id" exact component={ProcessMaps} props={childProps} />
